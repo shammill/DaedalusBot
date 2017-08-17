@@ -67,7 +67,7 @@ namespace NadekoBot.Modules.Games
                 if (amount < 1)
                     return;
 
-                var removed = await _cs.RemoveAsync((IGuildUser)Context.User, $"Planted a {_bc.BotConfig.CurrencyName}", amount, false).ConfigureAwait(false);
+                var removed = await _cs.RemoveAsync((IGuildUser)Context.User, $"Dropped a {_bc.BotConfig.CurrencyName}", amount, false).ConfigureAwait(false);
                 if (!removed)
                 {
                     await ReplyErrorLocalized("not_enough", _bc.BotConfig.CurrencySign).ConfigureAwait(false);
@@ -101,6 +101,51 @@ namespace NadekoBot.Modules.Games
                     return old;
                 });
             }
+			
+			[NadekoCommand, Usage, Description, Aliases]
+            [RequireContext(ContextType.Guild)]
+            public async Task Ree(int amount = 1)
+            {
+                if (amount < 1)
+                    return;
+
+                var removed = await _cs.RemoveAsync((IGuildUser)Context.User, $"Dropped a {_bc.BotConfig.CurrencyName}", amount, false).ConfigureAwait(false);
+                if (!removed)
+                {
+                    await ReplyErrorLocalized("not_enough", _bc.BotConfig.CurrencySign).ConfigureAwait(false);
+                    return;
+                }
+
+                var imgData = _games.GetRandomCurrencyImage();
+
+                //todo upload all currency images to transfer.sh and use that one as cdn
+                //and then 
+
+                var msgToSend = GetText("planted",
+                    Format.Bold(Context.User.ToString()),
+                    amount + _bc.BotConfig.CurrencySign,
+                    Prefix);
+
+                if (amount > 1)
+                    msgToSend += " " + GetText("pick_pl", Prefix);
+                else
+                    msgToSend += " " + GetText("pick_sn", Prefix);
+
+                IUserMessage msg;
+                using (var toSend = imgData.Data.ToStream())
+                {
+                    msg = await Context.Channel.SendFileAsync(toSend, imgData.Name, msgToSend).ConfigureAwait(false);
+                }
+
+                var msgs = new IUserMessage[amount];
+                msgs[0] = msg;
+
+                _games.PlantedFlowers.AddOrUpdate(Context.Channel.Id, msgs.ToList(), (id, old) =>
+                {
+                    old.AddRange(msgs);
+                    return old;
+                });
+            }	
 
             [NadekoCommand, Usage, Description, Aliases]
             [RequireContext(ContextType.Guild)]

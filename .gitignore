@@ -5,6 +5,8 @@ command_errors*.txt
 
 src/NadekoBot/Command Errors*.txt
 
+credentials.json
+
 src/NadekoBot/credentials.json
 src/NadekoBot/data/NadekoBot.db
 src/NadekoBot/data/musicdata

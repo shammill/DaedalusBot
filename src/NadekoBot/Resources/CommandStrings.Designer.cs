@@ -67,6 +67,15 @@ namespace NadekoBot.Resources {
                 return ResourceManager.GetString("_8ball_cmd", resourceCulture);
             }
         }
+		
+		/// <summary>
+        ///    Looks up a localized string similar to asx.
+        /// </summary>
+        public static string asx_cmd {
+            get {
+                return ResourceManager.GetString("asx_cmd", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///    Looks up a localized string similar to Ask the 8ball a yes/no question..

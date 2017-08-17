@@ -1431,6 +1431,15 @@
   <data name="plant_usage" xml:space="preserve">
     <value>`{0}plant` or `{0}plant 5`</value>
   </data>
+  <data name="ree_cmd" xml:space="preserve">
+    <value>ree</value>
+  </data>
+  <data name="ree_desc" xml:space="preserve">
+    <value>Spend an amount of currency to plant it in this channel. Default is 1. (If bot is restarted or crashes, the currency will be lost)</value>
+  </data>
+  <data name="ree_usage" xml:space="preserve">
+    <value>`{0}plant` or `{0}plant 5`</value>
+  </data> 
   <data name="gencurrency_cmd" xml:space="preserve">
     <value>gencurrency gc</value>
   </data>
@@ -3527,6 +3536,9 @@
   </data>
   <data name="verboseerror_desc" xml:space="preserve">
     <value>Toggles whether the bot should print command errors when a command is incorrectly used.</value>
+  </data>
+  <data name="asx_cmd" xml:space="preserve">
+    <value>asx</value>
   </data>
   <data name="streamrolekeyword_cmd" xml:space="preserve">
     <value>streamrolekw srkw</value>

@@ -85,6 +85,8 @@ namespace NadekoBot.Extensions
             http.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         }
 
+		public static DateTime ToLocalTimestamp(this double number) => new DateTime(1970, 1, 1, 10, 0, 0, DateTimeKind.Local).AddSeconds(number);
+
         public static IMessage DeleteAfter(this IUserMessage msg, int seconds)
         {
             Task.Run(async () =>

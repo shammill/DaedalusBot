@@ -10,6 +10,7 @@ using System.Net;
 using System.Collections.Generic;
 using NadekoBot.Extensions;
 using System.IO;
+using NadekoBot.Modules.Searches.Commands.Models;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using AngleSharp.Dom;
@@ -35,15 +36,15 @@ namespace NadekoBot.Modules.Searches
         }
 
         [NadekoCommand, Usage, Description, Aliases]
-        public async Task Weather([Remainder] string query)
+        public async Task Weather()
         {
-            if (string.IsNullOrWhiteSpace(query))
-                return;
-
             string response;
-            using (var http = new HttpClient())
-                response = await http.GetStringAsync($"http://api.openweathermap.org/data/2.5/weather?q={query}&appid=42cd627dd60debf25a5739e50a217d74&units=metric").ConfigureAwait(false);
-
+            
+			using (var http = new HttpClient()) {
+                http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+                response = await http.GetStringAsync($"http://api.openweathermap.org/data/2.5/weather?q=Melbourne,AU&appid=42cd627dd60debf25a5739e50a217d74&units=metric").ConfigureAwait(false);
+            }
+			
             var data = JsonConvert.DeserializeObject<WeatherData>(response);
 
             var embed = new EmbedBuilder()
@@ -54,10 +55,49 @@ namespace NadekoBot.Modules.Searches
                 .AddField(fb => fb.WithName("💨 " + Format.Bold(GetText("wind_speed"))).WithValue(data.Wind.Speed + " m/s").WithIsInline(true))
                 .AddField(fb => fb.WithName("🌡 " + Format.Bold(GetText("temperature"))).WithValue(data.Main.Temp + "°C").WithIsInline(true))
                 .AddField(fb => fb.WithName("🔆 " + Format.Bold(GetText("min_max"))).WithValue($"{data.Main.TempMin}°C - {data.Main.TempMax}°C").WithIsInline(true))
-                .AddField(fb => fb.WithName("🌄 " + Format.Bold(GetText("sunrise"))).WithValue($"{data.Sys.Sunrise.ToUnixTimestamp():HH:mm} UTC").WithIsInline(true))
-                .AddField(fb => fb.WithName("🌇 " + Format.Bold(GetText("sunset"))).WithValue($"{data.Sys.Sunset.ToUnixTimestamp():HH:mm} UTC").WithIsInline(true))
+                .AddField(fb => fb.WithName("🌄 " + Format.Bold(GetText("sunrise"))).WithValue($"{data.Sys.Sunrise.ToLocalTimestamp():HH:mm} AEST").WithIsInline(true))
+                .AddField(fb => fb.WithName("🌇 " + Format.Bold(GetText("sunset"))).WithValue($"{data.Sys.Sunset.ToLocalTimestamp():HH:mm} AEST").WithIsInline(true))
                 .WithOkColor()
                 .WithFooter(efb => efb.WithText("Powered by openweathermap.org").WithIconUrl($"http://openweathermap.org/img/w/{data.Weather[0].Icon}.png"));
+            await Context.Channel.EmbedAsync(embed).ConfigureAwait(false);
+        }
+		
+		[NadekoCommand, Usage, Description, Aliases]
+        public async Task ASX([Remainder] string stock)
+        {
+            string response;
+            using (var http = new HttpClient()) {
+                http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+                response = await http.GetStringAsync($"http://data.asx.com.au/data/1/share/{stock}/").ConfigureAwait(false);
+            }
+            var data = JsonConvert.DeserializeObject<ASXData>(response);
+            
+            var embed = new EmbedBuilder()
+                .AddField(fb => fb.WithName(":earth_asia: " + Format.Bold("Code")).WithValue($"[{data.code}](http://data.asx.com.au/data/1/share/{data.code}/)").WithIsInline(true))
+                .AddField(fb => fb.WithName(":moneybag: " + Format.Bold("Last Price")).WithValue($"${data.last_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":chart_with_upwards_trend: " + Format.Bold("Daily High")).WithValue($"${data.day_high_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":chart_with_downwards_trend: " + Format.Bold("Daily Low")).WithValue($"${data.day_low_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName("🌄 " + Format.Bold("Open Price")).WithValue($"${data.open_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":money_with_wings: " + Format.Bold("Change Price")).WithValue($"${data.change_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":money_with_wings: " + Format.Bold("Change Percent")).WithValue($"{data.change_in_percent}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":money_with_wings: " + Format.Bold("Previous Daily Change")).WithValue($"{data.previous_day_percentage_change}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":night_with_stars: " + Format.Bold("Previous Close Price")).WithValue($"${data.previous_close_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":chart_with_upwards_trend: " + Format.Bold("Yearly High Price")).WithValue($"${data.year_high_price}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":chart_with_downwards_trend: " + Format.Bold("Yearly Low Price")).WithValue($"${data.year_low_price}").WithIsInline(true))
+
+                .WithOkColor()
+                .WithFooter(efb => efb.WithText("Powered by data.asx.com.au"));
+
+            if (data.year_change_in_percentage != null && data.year_change_in_percentage != String.Empty)
+            {
+                embed.AddField(fb => fb.WithName(":gem: " + Format.Bold("Yearly % Change")).WithValue($"{data.year_change_in_percentage}").WithIsInline(true));
+            }
+            embed
+                .AddField(fb => fb.WithName(":bar_chart:  " + Format.Bold("Volume")).WithValue($"{data.volume}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":bar_chart:  " + Format.Bold("Average Daily Vol")).WithValue($"{data.average_daily_volume}").WithIsInline(true))
+                .AddField(fb => fb.WithName(":bar_chart:  " + Format.Bold("Total Vol")).WithValue($"{data.number_of_shares}").WithIsInline(true));
+
+
             await Context.Channel.EmbedAsync(embed).ConfigureAwait(false);
         }
 

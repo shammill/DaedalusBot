@@ -9,7 +9,7 @@ namespace NadekoBot.Services.Database.Models
         public bool ForwardMessages { get; set; } = true;
         public bool ForwardToAllOwners { get; set; } = true;
 
-        public float CurrencyGenerationChance { get; set; } = 0.02f;
+        public float CurrencyGenerationChance { get; set; } = 0.04f;
         public int CurrencyGenerationCooldown { get; set; } = 10;
 
         public HashSet<ModulePrefix> ModulePrefixes { get; set; } = new HashSet<ModulePrefix>();
@@ -20,14 +20,14 @@ namespace NadekoBot.Services.Database.Models
         public string RemindMessageFormat { get; set; } = "❗⏰**I've been told to remind you to '%message%' now by %user%.**⏰❗";
         
         //currency
-        public string CurrencySign { get; set; } = "🌸";
-        public string CurrencyName { get; set; } = "Nadeko Flower";
-        public string CurrencyPluralName { get; set; } = "Nadeko Flowers";
+        public string CurrencySign { get; set; } = "GPB"; // old: "🌸"
+        public string CurrencyName { get; set; } = "Good Boy Point";
+        public string CurrencyPluralName { get; set; } = "Good Boy Points";
 
-        public int TriviaCurrencyReward { get; set; } = 0;
+        public int TriviaCurrencyReward { get; set; } = 10;
         public int MinimumBetAmount { get; set; } = 2;
         public float BetflipMultiplier { get; set; } = 1.95f;
-        public int CurrencyDropAmount { get; set; } = 1;
+        public int CurrencyDropAmount { get; set; } = 10;
         public int? CurrencyDropAmountMax { get; set; } = null;
         public float Betroll67Multiplier { get; set; } = 2;
         public float Betroll91Multiplier { get; set; } = 4;
