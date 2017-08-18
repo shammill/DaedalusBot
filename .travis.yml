@@ -1,9 +1,11 @@
 language: csharp  
 sudo: required  
 dist: trusty  
-services:
-  - docker
 os:  
   - linux
+install:  
+  - export DOTNET_INSTALL_DIR="$PWD/.dotnetcli"
+  - curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh | bash /dev/stdin --install-dir "$DOTNET_INSTALL_DIR"
+  - export PATH="$DOTNET_INSTALL_DIR:$PATH"  
 script:  
-  - docker build -t daedalus_test ./src/NadekoBot/
+  - ./travis_build.sh
